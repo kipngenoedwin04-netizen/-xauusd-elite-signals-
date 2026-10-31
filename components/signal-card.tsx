@@ -1,4 +1,62 @@
-export type Signal = { id: string; direction: string; access: string; entry: number; stop_loss: number; tp1: number; tp2: number; timeframe: string; analysis: string; status: string; created_at: string };
+export type Signal = {
+  id: string;
+  direction: string;
+  access: string;
+  entry: number;
+  stop_loss: number;
+  tp1: number;
+  tp2: number;
+  timeframe: string;
+  analysis: string;
+  status: string;
+  created_at: string;
+  image_url?: string | null;
+};
+
 export function SignalCard({ signal }: { signal: Signal }) {
-  return <article className="signal-card"><div className="signal-top"><span className={`direction ${signal.direction === "BUY" ? "buy" : "sell"}`}>{signal.direction}</span><span className="access-tag">{signal.access.toUpperCase()}</span><span className="status">{signal.status}</span></div><div className="signal-title">XAUUSD <small>GOLD</small></div><div className="price-grid"><div><label>ENTRY</label><b>{Number(signal.entry).toFixed(2)}</b></div><div><label>STOP LOSS</label><b className="danger">{Number(signal.stop_loss).toFixed(2)}</b></div><div><label>TAKE PROFIT 1</label><b className="success">{Number(signal.tp1).toFixed(2)}</b></div><div><label>TAKE PROFIT 2</label><b className="success">{Number(signal.tp2).toFixed(2)}</b></div></div><div className="analysis"><label>MARKET ANALYSIS · {signal.timeframe}</label><p>{signal.analysis}</p></div><footer className="signal-foot">Published {new Date(signal.created_at).toLocaleString("en-KE", { dateStyle: "medium", timeStyle: "short", timeZone: "Africa/Nairobi" })}</footer></article>;
+  return (
+    <article className="signal-card">
+      <div className="signal-top">
+        <span className={`direction ${signal.direction === "BUY" ? "buy" : "sell"}`}>
+          {signal.direction}
+        </span>
+        <span className="access-tag">{signal.access.toUpperCase()}</span>
+        <span className="status">{signal.status}</span>
+      </div>
+
+      <div className="signal-title">
+        XAUUSD <small>GOLD</small>
+      </div>
+
+      {signal.image_url && (
+        <div className="signal-image">
+          <img
+            src={signal.image_url}
+            alt="XAUUSD trading chart"
+            loading="lazy"
+          />
+        </div>
+      )}
+
+      <div className="price-grid">
+        <div><label>ENTRY</label><b>{Number(signal.entry).toFixed(2)}</b></div>
+        <div><label>STOP LOSS</label><b className="danger">{Number(signal.stop_loss).toFixed(2)}</b></div>
+        <div><label>TAKE PROFIT 1</label><b className="success">{Number(signal.tp1).toFixed(2)}</b></div>
+        <div><label>TAKE PROFIT 2</label><b className="success">{Number(signal.tp2).toFixed(2)}</b></div>
+      </div>
+
+      <div className="analysis">
+        <label>MARKET ANALYSIS · {signal.timeframe}</label>
+        <p>{signal.analysis}</p>
+      </div>
+
+      <footer className="signal-foot">
+        Published {new Date(signal.created_at).toLocaleString("en-KE", {
+          dateStyle: "medium",
+          timeStyle: "short",
+          timeZone: "Africa/Nairobi"
+        })}
+      </footer>
+    </article>
+  );
 }
