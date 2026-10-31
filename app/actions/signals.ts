@@ -17,9 +17,9 @@ async function uploadSignalImage(supabase: any, formData: FormData) {
     throw new Error("Only JPG, PNG and WEBP images are allowed.");
   }
 
-  if (image.size > 5 * 1024 * 1024) {
-    throw new Error("Image must not exceed 5MB.");
-  }
+ if (image.size > 12 * 1024 * 1024) {
+  throw new Error("Image must not exceed 12MB.");
+ }
 
   const extension = image.type.split("/")[1];
   const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${extension}`;
