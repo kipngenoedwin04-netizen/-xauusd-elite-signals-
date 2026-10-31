@@ -6,7 +6,11 @@ import { SignalCard, type Signal } from "@/components/signal-card";
 export default async function DashboardPage() {
   const { supabase, user, profile } = await requireUser();
 
-  const { data: signals, error } = await supabase
+  const approved =
+    profile?.premium_status === "approved" ||
+    profile?.role === "admin";
+
+  let signalsQuery = supabase
     .from("signals")
     .select(
       "id,direction,access,entry,stop_loss,tp1,tp2,timeframe,analysis,status,created_at,image_url"
@@ -14,9 +18,12 @@ export default async function DashboardPage() {
     .order("created_at", { ascending: false })
     .limit(50);
 
-  const approved =
-    profile?.premium_status === "approved" ||
-    profile?.role === "admin";
+  // FREE members must never receive premium signals.
+  if (!approved) {
+    signalsQuery = signalsQuery.eq("access", "free");
+  }
+
+  const { data: signals, error } = await signalsQuery;
 
   return (
     <main className="dashboard-page">
@@ -48,7 +55,7 @@ export default async function DashboardPage() {
           <small>
             {approved
               ? "You can view free and premium signals."
-              : "You can view public and free signals."}
+              : "You can view free signals only."}
           </small>
         </div>
 
@@ -104,4 +111,4 @@ export default async function DashboardPage() {
       )}
     </main>
   );
-}
+              }
