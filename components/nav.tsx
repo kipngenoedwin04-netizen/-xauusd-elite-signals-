@@ -6,18 +6,18 @@ import { getUserAndProfile } from "@/lib/auth";
 export async function Nav() {
   const { user, profile } = await getUserAndProfile();
 
-  // Hide navigation before login
   if (!user) return null;
 
   const isAdmin = profile?.role === "admin";
 
   const itemStyle = {
     display: "block",
-    padding: "14px 16px",
+    padding: "15px 16px",
     textDecoration: "none",
-    color: "#f5f5f5",
-    borderBottom: "1px solid #333",
+    color: "#FFE99A",
+    borderBottom: "1px solid rgba(255,215,0,0.25)",
     fontSize: "14px",
+    fontWeight: 650,
   };
 
   return (
@@ -29,9 +29,11 @@ export async function Nav() {
         justifyContent: "flex-start",
         gap: "18px",
         position: "relative",
+        background: "linear-gradient(90deg,#080808,#191300,#080808)",
+        borderBottom: "1px solid rgba(255,215,0,0.55)",
       }}
     >
-      {/* FOUR DOTS MENU - TOP LEFT */}
+      {/* FOUR DOTS MENU */}
       <details style={{ position: "relative" }}>
         <summary
           aria-label="Open navigation menu"
@@ -42,49 +44,50 @@ export async function Nav() {
             display: "grid",
             gridTemplateColumns: "repeat(2, 7px)",
             gap: "5px",
-            padding: "12px",
-            background: "#242424",
-            border: "1px solid #b58b35",
+            padding: "13px",
+            background: "linear-gradient(135deg,#FFE98A,#FFD700,#E6A900)",
+            border: "1px solid #FFF0A6",
             borderRadius: "10px",
+            boxShadow: "0 0 15px rgba(255,215,0,0.25)",
           }}
         >
-          <span style={{ width: 7, height: 7, background: "#e9bb4e", borderRadius: "50%" }} />
-          <span style={{ width: 7, height: 7, background: "#e9bb4e", borderRadius: "50%" }} />
-          <span style={{ width: 7, height: 7, background: "#e9bb4e", borderRadius: "50%" }} />
-          <span style={{ width: 7, height: 7, background: "#e9bb4e", borderRadius: "50%" }} />
+          <span style={{ width: 7, height: 7, background: "#171006", borderRadius: "50%" }} />
+          <span style={{ width: 7, height: 7, background: "#171006", borderRadius: "50%" }} />
+          <span style={{ width: 7, height: 7, background: "#171006", borderRadius: "50%" }} />
+          <span style={{ width: 7, height: 7, background: "#171006", borderRadius: "50%" }} />
         </summary>
 
-        {/* VERTICAL DROPDOWN */}
+        {/* GOLD PREMIUM DROPDOWN */}
         <nav
           style={{
             position: "absolute",
             top: "calc(100% + 12px)",
             left: 0,
-            width: "230px",
+            width: "240px",
             display: "flex",
             flexDirection: "column",
-            background: "#171717",
-            border: "1px solid #8b6a2d",
+            background: "linear-gradient(145deg,#211B08,#11100B)",
+            border: "1px solid #FFD700",
             borderRadius: "12px",
             padding: "8px",
             zIndex: 1000,
-            boxShadow: "0 12px 30px rgba(0,0,0,0.5)",
+            boxShadow: "0 12px 35px rgba(0,0,0,0.7), 0 0 15px rgba(255,215,0,0.12)",
           }}
         >
           <Link href="/dashboard" style={itemStyle}>
-            Home — Signals
+            🏠 Home — Signals
           </Link>
 
           <Link href="/membership" style={itemStyle}>
-            Dashboard — Membership
+            👤 Dashboard — Membership
           </Link>
 
           <Link href="/premium" style={itemStyle}>
-            Premium / VIP
+            👑 Premium / VIP
           </Link>
 
           <Link href="/settings" style={itemStyle}>
-            App Settings
+            ⚙️ App Settings
           </Link>
 
           <Link
@@ -93,12 +96,12 @@ export async function Nav() {
             rel="noopener noreferrer"
             style={itemStyle}
           >
-            Help & Support
+            💬 Help & Support
           </Link>
 
           {isAdmin && (
             <Link href="/admin" style={itemStyle}>
-              Admin Panel
+              🛡️ Admin Panel
             </Link>
           )}
 
@@ -107,16 +110,17 @@ export async function Nav() {
               type="submit"
               style={{
                 width: "100%",
-                padding: "14px 16px",
+                padding: "15px 16px",
                 textAlign: "left",
-                background: "transparent",
+                background: "linear-gradient(90deg,rgba(255,215,0,0.12),transparent)",
                 border: "none",
-                color: "#e9bb4e",
+                color: "#FFD700",
                 cursor: "pointer",
                 fontSize: "14px",
+                fontWeight: 800,
               }}
             >
-              Sign Out
+              ↪ Sign Out
             </button>
           </form>
         </nav>
