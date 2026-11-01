@@ -10,8 +10,8 @@ export default async function DashboardPage() {
     profile?.premium_status === "approved" ||
     profile?.role === "admin";
 
-  // Secure feed: the database decides which signal details
-  // this signed-in member is allowed to receive.
+  // Secure feed: the database controls which signal details
+  // each signed-in member is allowed to receive.
   const { data: rawSignals, error } = await supabase.rpc(
     "get_dashboard_signals"
   );
@@ -29,7 +29,9 @@ export default async function DashboardPage() {
               {profile?.display_name || user.email?.split("@")[0]}
             </em>
           </h1>
-          <p>Your account and latest eligible XAUUSD trade ideas.</p>
+          <p>
+            Your latest XAUUSD market analysis and eligible trading signals.
+          </p>
         </div>
 
         <span className={`membership-pill ${approved ? "premium" : "free"}`}>
@@ -48,7 +50,7 @@ export default async function DashboardPage() {
           <small>
             {approved
               ? "You can view complete free and premium signals."
-              : "You can view free signals and VIP previews."}
+              : "You can view free signals, market analysis and VIP previews."}
           </small>
         </div>
 
@@ -81,8 +83,8 @@ export default async function DashboardPage() {
 
       <div className="section-heading">
         <div>
-          <div className="eyebrow">YOUR SIGNAL ACCESS</div>
-          <h2>Latest signals</h2>
+          <div className="eyebrow">YOUR MARKET FEED</div>
+          <h2>Latest posts</h2>
         </div>
 
         {profile?.role === "admin" && (
@@ -94,7 +96,7 @@ export default async function DashboardPage() {
 
       {error ? (
         <div className="notice error">
-          Could not load signals. Please refresh.
+          Could not load posts. Please refresh.
         </div>
       ) : signals.length > 0 ? (
         <div className="signal-grid">
@@ -104,9 +106,10 @@ export default async function DashboardPage() {
         </div>
       ) : (
         <div className="empty-state">
-          <h3>No signals published yet</h3>
+          <h3>No posts published yet</h3>
           <p>
-            New signals will appear here after the administrator publishes them.
+            Market analysis and new trading signals will appear here
+            after the administrator publishes them.
           </p>
         </div>
       )}
