@@ -1,16 +1,14 @@
-
 {
   "id": "/",
   "name": "XAUUSD Elite Signals",
   "short_name": "XAUUSD Elite",
-  "description": "Gold trading strategies, education, signals and risk management.",
+  "description": "Professional XAUUSD trading signals and market analysis.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#080808",
-  "theme_color": "#080808",
-  "categories": ["finance", "education"],
+  "theme_color": "#D4AF37",
   "icons": [
     {
       "src": "/icon-192.png",
@@ -21,6 +19,12 @@
     {
       "src": "/icon-512.png",
       "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
       "type": "image/png",
       "purpose": "any"
     }
