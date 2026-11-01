@@ -22,7 +22,7 @@ export default async function AdminPage({
     supabase
       .from("signals")
       .select(
-        "id,direction,access,entry,stop_loss,tp1,tp2,timeframe,analysis,status,created_at,image_url"
+        "id,post_type,direction,access,entry,stop_loss,tp1,tp2,timeframe,analysis,status,created_at,image_url"
       )
       .order("created_at", { ascending: false })
       .limit(100),
@@ -47,7 +47,10 @@ export default async function AdminPage({
             database policies.
           </p>
         </div>
-        <span className="membership-pill premium">PIXLEY021 · ADMIN</span>
+
+        <span className="membership-pill premium">
+          PIXLEY021 · ADMIN
+        </span>
       </div>
 
       {params.error && (
@@ -59,16 +62,19 @@ export default async function AdminPage({
       )}
 
       <div className="admin-layout">
+        {/* TRADING SIGNAL FORM */}
         <section className="admin-box">
           <div className="eyebrow">PUBLISH NEW TRADE IDEA</div>
-          <h2>Create signal</h2>
+          <h2>Create trading signal</h2>
 
           <form action={createSignal} className="admin-form">
+            <input type="hidden" name="post_type" value="signal" />
+
             <label>
               Direction
-              <select name="direction">
-                <option>BUY</option>
-                <option>SELL</option>
+              <select name="direction" required>
+                <option value="BUY">BUY</option>
+                <option value="SELL">SELL</option>
               </select>
             </label>
 
@@ -82,22 +88,46 @@ export default async function AdminPage({
 
             <label>
               Entry
-              <input name="entry" type="number" step="0.01" min="0.01" required />
+              <input
+                name="entry"
+                type="number"
+                step="0.01"
+                min="0.01"
+                required
+              />
             </label>
 
             <label>
               Stop loss
-              <input name="stop_loss" type="number" step="0.01" min="0.01" required />
+              <input
+                name="stop_loss"
+                type="number"
+                step="0.01"
+                min="0.01"
+                required
+              />
             </label>
 
             <label>
               Take profit 1
-              <input name="tp1" type="number" step="0.01" min="0.01" required />
+              <input
+                name="tp1"
+                type="number"
+                step="0.01"
+                min="0.01"
+                required
+              />
             </label>
 
             <label>
               Take profit 2
-              <input name="tp2" type="number" step="0.01" min="0.01" required />
+              <input
+                name="tp2"
+                type="number"
+                step="0.01"
+                min="0.01"
+                required
+              />
             </label>
 
             <label className="span-two">
@@ -111,13 +141,12 @@ export default async function AdminPage({
             </label>
 
             <label className="span-two">
-              Market analysis
+              Market analysis (optional)
               <textarea
                 name="analysis"
                 rows={4}
-                required
                 maxLength={2000}
-                placeholder="Explain structure, key levels and confirmation..."
+                placeholder="Optional: Explain market structure, key levels and confirmation..."
               />
             </label>
 
@@ -140,6 +169,7 @@ export default async function AdminPage({
           </form>
         </section>
 
+        {/* MEMBERSHIP MANAGEMENT */}
         <section className="admin-box">
           <div className="eyebrow">MEMBERSHIP MANAGEMENT</div>
           <h2>Registered users</h2>
@@ -157,7 +187,11 @@ export default async function AdminPage({
 
                 {u.role !== "admin" && (
                   <form action={setPremiumStatus}>
-                    <input type="hidden" name="user_id" value={u.id} />
+                    <input
+                      type="hidden"
+                      name="user_id"
+                      value={u.id}
+                    />
 
                     <select
                       name="premium_status"
@@ -182,171 +216,295 @@ export default async function AdminPage({
         </section>
       </div>
 
+      {/* STANDALONE MARKET ANALYSIS FORM */}
+      <section className="section admin-box">
+        <div className="eyebrow">MARKET INTELLIGENCE</div>
+        <h2>Publish market analysis</h2>
+
+        <p className="muted">
+          Share your XAUUSD market outlook, fundamental analysis or technical
+          breakdown without publishing a BUY or SELL signal.
+        </p>
+
+        <form action={createSignal} className="admin-form">
+          <input type="hidden" name="post_type" value="analysis" />
+
+          <input type="hidden" name="access" value="free" />
+
+          <label className="span-two">
+            Timeframe (optional)
+            <input
+              name="timeframe"
+              placeholder="e.g. H4 / H1 / Daily"
+              maxLength={20}
+            />
+          </label>
+
+          <label className="span-two">
+            Your market analysis
+            <textarea
+              name="analysis"
+              rows={7}
+              required
+              maxLength={2000}
+              placeholder="Example: Gold is showing bearish pressure on H4. Price is approaching a key support zone..."
+            />
+          </label>
+
+          <label className="span-two">
+            Upload chart screenshot (optional)
+            <input
+              type="file"
+              name="image"
+              accept="image/jpeg,image/png,image/webp"
+            />
+            <small>JPG, PNG or WEBP · Maximum 12MB</small>
+          </label>
+
+          <SubmitButton
+            className="btn btn-gold span-two"
+            pendingLabel="Publishing..."
+          >
+            Publish market analysis
+          </SubmitButton>
+        </form>
+      </section>
+
+      {/* PUBLISHED POSTS */}
       <section className="section admin-signals">
         <div className="section-heading">
           <div>
-            <div className="eyebrow">SIGNAL MANAGEMENT</div>
-            <h2>Published signals</h2>
+            <div className="eyebrow">CONTENT MANAGEMENT</div>
+            <h2>Published posts</h2>
           </div>
-          <span className="muted">{signals?.length ?? 0} shown</span>
+
+          <span className="muted">
+            {signals?.length ?? 0} shown
+          </span>
         </div>
 
         {signals?.length ? (
           <div className="admin-signal-list">
-            {signals.map((s) => (
-              <div className="admin-signal-item" key={s.id}>
-                <SignalCard signal={s as Signal} />
+            {signals.map((s) => {
+              const postType = s.post_type || "signal";
+              const isAnalysis = postType === "analysis";
 
-                <div className="signal-actions">
-                  <form action={updateSignalStatus}>
-                    <input type="hidden" name="id" value={s.id} />
+              return (
+                <div className="admin-signal-item" key={s.id}>
+                  <SignalCard signal={s as Signal} />
 
-                    <select name="status" defaultValue={s.status}>
-                      <option>OPEN</option>
-                      <option>TP1 HIT</option>
-                      <option>TP2 HIT</option>
-                      <option>SL HIT</option>
-                      <option>CLOSED</option>
-                    </select>
+                  <div className="signal-actions">
+                    <form action={updateSignalStatus}>
+                      <input
+                        type="hidden"
+                        name="id"
+                        value={s.id}
+                      />
 
-                    <SubmitButton
-                      className="mini-button"
-                      pendingLabel="Updating..."
+                      <select name="status" defaultValue={s.status}>
+                        <option>OPEN</option>
+                        <option>TP1 HIT</option>
+                        <option>TP2 HIT</option>
+                        <option>SL HIT</option>
+                        <option>CLOSED</option>
+                      </select>
+
+                      <SubmitButton
+                        className="mini-button"
+                        pendingLabel="Updating..."
+                      >
+                        Update status
+                      </SubmitButton>
+                    </form>
+
+                    <form action={deleteSignal}>
+                      <input
+                        type="hidden"
+                        name="id"
+                        value={s.id}
+                      />
+
+                      <SubmitButton
+                        className="mini-button danger-button"
+                        pendingLabel="Deleting..."
+                      >
+                        Delete
+                      </SubmitButton>
+                    </form>
+                  </div>
+
+                  <details className="edit-details">
+                    <summary>
+                      Edit {isAnalysis ? "market analysis" : "signal details"}
+                    </summary>
+
+                    <form
+                      action={editSignal}
+                      className="admin-form edit-form"
                     >
-                      Update status
-                    </SubmitButton>
-                  </form>
+                      <input
+                        type="hidden"
+                        name="id"
+                        value={s.id}
+                      />
 
-                  <form action={deleteSignal}>
-                    <input type="hidden" name="id" value={s.id} />
+                      <input
+                        type="hidden"
+                        name="post_type"
+                        value={postType}
+                      />
 
-                    <SubmitButton
-                      className="mini-button danger-button"
-                      pendingLabel="Deleting..."
-                    >
-                      Delete
-                    </SubmitButton>
-                  </form>
+                      {isAnalysis ? (
+                        <>
+                          <input
+                            type="hidden"
+                            name="access"
+                            value="free"
+                          />
+
+                          <label className="span-two">
+                            Timeframe (optional)
+                            <input
+                              name="timeframe"
+                              defaultValue={s.timeframe ?? ""}
+                              maxLength={20}
+                            />
+                          </label>
+
+                          <label className="span-two">
+                            Market analysis
+                            <textarea
+                              name="analysis"
+                              rows={5}
+                              defaultValue={s.analysis ?? ""}
+                              required
+                              maxLength={2000}
+                            />
+                          </label>
+                        </>
+                      ) : (
+                        <>
+                          <label>
+                            Direction
+                            <select
+                              name="direction"
+                              defaultValue={s.direction ?? "BUY"}
+                            >
+                              <option value="BUY">BUY</option>
+                              <option value="SELL">SELL</option>
+                            </select>
+                          </label>
+
+                          <label>
+                            Access
+                            <select
+                              name="access"
+                              defaultValue={s.access}
+                            >
+                              <option value="free">FREE</option>
+                              <option value="premium">PREMIUM</option>
+                            </select>
+                          </label>
+
+                          <label>
+                            Entry
+                            <input
+                              name="entry"
+                              type="number"
+                              step="0.01"
+                              min="0.01"
+                              defaultValue={s.entry ?? ""}
+                              required
+                            />
+                          </label>
+
+                          <label>
+                            Stop loss
+                            <input
+                              name="stop_loss"
+                              type="number"
+                              step="0.01"
+                              min="0.01"
+                              defaultValue={s.stop_loss ?? ""}
+                              required
+                            />
+                          </label>
+
+                          <label>
+                            Take profit 1
+                            <input
+                              name="tp1"
+                              type="number"
+                              step="0.01"
+                              min="0.01"
+                              defaultValue={s.tp1 ?? ""}
+                              required
+                            />
+                          </label>
+
+                          <label>
+                            Take profit 2
+                            <input
+                              name="tp2"
+                              type="number"
+                              step="0.01"
+                              min="0.01"
+                              defaultValue={s.tp2 ?? ""}
+                              required
+                            />
+                          </label>
+
+                          <label className="span-two">
+                            Timeframe
+                            <input
+                              name="timeframe"
+                              defaultValue={s.timeframe ?? ""}
+                              required
+                              maxLength={20}
+                            />
+                          </label>
+
+                          <label className="span-two">
+                            Market analysis (optional)
+                            <textarea
+                              name="analysis"
+                              rows={3}
+                              defaultValue={s.analysis ?? ""}
+                              maxLength={2000}
+                            />
+                          </label>
+                        </>
+                      )}
+
+                      <label className="span-two">
+                        Replace chart screenshot (optional)
+                        <input
+                          type="file"
+                          name="image"
+                          accept="image/jpeg,image/png,image/webp"
+                        />
+                        <small>JPG, PNG or WEBP · Maximum 12MB</small>
+                      </label>
+
+                      <SubmitButton
+                        className="mini-button span-two"
+                        pendingLabel="Saving..."
+                      >
+                        Save changes
+                      </SubmitButton>
+                    </form>
+                  </details>
                 </div>
-
-                <details className="edit-details">
-                  <summary>Edit signal details</summary>
-
-                  <form action={editSignal} className="admin-form edit-form">
-                    <input type="hidden" name="id" value={s.id} />
-
-                    <label>
-                      Direction
-                      <select name="direction" defaultValue={s.direction}>
-                        <option>BUY</option>
-                        <option>SELL</option>
-                      </select>
-                    </label>
-
-                    <label>
-                      Access
-                      <select name="access" defaultValue={s.access}>
-                        <option value="free">FREE</option>
-                        <option value="premium">PREMIUM</option>
-                      </select>
-                    </label>
-
-                    <label>
-                      Entry
-                      <input
-                        name="entry"
-                        type="number"
-                        step="0.01"
-                        min="0.01"
-                        defaultValue={s.entry}
-                        required
-                      />
-                    </label>
-
-                    <label>
-                      Stop loss
-                      <input
-                        name="stop_loss"
-                        type="number"
-                        step="0.01"
-                        min="0.01"
-                        defaultValue={s.stop_loss}
-                        required
-                      />
-                    </label>
-
-                    <label>
-                      Take profit 1
-                      <input
-                        name="tp1"
-                        type="number"
-                        step="0.01"
-                        min="0.01"
-                        defaultValue={s.tp1}
-                        required
-                      />
-                    </label>
-
-                    <label>
-                      Take profit 2
-                      <input
-                        name="tp2"
-                        type="number"
-                        step="0.01"
-                        min="0.01"
-                        defaultValue={s.tp2}
-                        required
-                      />
-                    </label>
-
-                    <label className="span-two">
-                      Timeframe
-                      <input
-                        name="timeframe"
-                        defaultValue={s.timeframe}
-                        required
-                        maxLength={20}
-                      />
-                    </label>
-
-                    <label className="span-two">
-                      Analysis
-                      <textarea
-                        name="analysis"
-                        rows={3}
-                        defaultValue={s.analysis}
-                        required
-                        maxLength={2000}
-                      />
-                    </label>
-
-                    <label className="span-two">
-                      Replace chart screenshot (optional)
-                      <input
-                        type="file"
-                        name="image"
-                        accept="image/jpeg,image/png,image/webp"
-                      />
-                      <small>JPG, PNG or WEBP · Maximum 12MB</small>
-                    </label>
-
-                    <SubmitButton
-                      className="mini-button span-two"
-                      pendingLabel="Saving..."
-                    >
-                      Save signal edits
-                    </SubmitButton>
-                  </form>
-                </details>
-              </div>
-            ))}
+              );
+            })}
           </div>
         ) : (
           <div className="empty-state">
-            No signals yet. Publish your first one above.
+            No posts yet. Publish your first signal or market analysis above.
           </div>
         )}
       </section>
     </main>
   );
-                      }
+        }
+        
