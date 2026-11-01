@@ -6,9 +6,14 @@ import { getUserAndProfile } from "@/lib/auth";
 export async function Nav() {
   const { user, profile } = await getUserAndProfile();
 
+  // No navigation menu for visitors who are not logged in
+  if (!user) return null;
+
+  const isAdmin = profile?.role === "admin";
+
   return (
     <header className="site-header">
-      <Link href="/" className="brand">
+      <Link href="/dashboard" className="brand">
         <span className="brand-mark">X</span>
         <span>
           XAUUSD <b>ELITE</b>
@@ -17,63 +22,32 @@ export async function Nav() {
       </Link>
 
       <details className="nav-menu">
-        <summary className="nav-menu-trigger" aria-label="Open navigation menu">
-          <span className="dot-grid">
-            <i /><i /><i /><i />
-          </span>
+        <summary
+          aria-label="Open navigation menu"
+          title="Menu"
+        >
+          <span>⠿</span>
         </summary>
 
-        <div className="nav-dropdown">
-          <div className="nav-dropdown-heading">
-            <span>THE ELITES</span>
-            <small>GOLD TRADING COMMUNITY</small>
-          </div>
-
-          <Link href="/" className="nav-menu-link">
-            <span>⌂</span> Home
+        <nav className="nav-dropdown">
+          <Link href="/dashboard">Home — Signals</Link>
+          <Link href="/membership">Dashboard — Membership</Link>
+          <Link href="/premium">Premium / VIP</Link>
+          <Link href="/settings">App Settings</Link>
+          <Link href="https://t.me/pixley021" target="_blank">
+            Help & Support
           </Link>
 
-          <Link href="/dashboard" className="nav-menu-link">
-            <span>▦</span> Dashboard
-          </Link>
-
-          <Link href="/premium" className="nav-menu-link premium-link">
-            <span>♛</span> Premium / VIP Signals
-            <small>$50</small>
-          </Link>
-
-          <Link href="/settings" className="nav-menu-link">
-            <span>⚙</span> App Settings
-          </Link>
-
-          <a
-            href="https://t.me/pixley021"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="nav-menu-link"
-          >
-            <span>?</span> Help & Support
-          </a>
-
-          {profile?.role === "admin" && (
-            <Link href="/admin" className="nav-menu-link">
-              <span>♜</span> Admin Panel
-            </Link>
+          {isAdmin && (
+            <Link href="/admin">Admin Panel</Link>
           )}
 
-          <div className="nav-dropdown-footer">
-            {user ? (
-              <form action={signOut}>
-                <button className="nav-button">Sign out</button>
-              </form>
-            ) : (
-              <>
-                <Link href="/auth/login">Login</Link>
-                <Link href="/auth/register">Create account</Link>
-              </>
-            )}
-          </div>
-        </div>
+          <form action={signOut}>
+            <button type="submit" className="nav-button">
+              Sign out
+            </button>
+          </form>
+        </nav>
       </details>
     </header>
   );
