@@ -2,6 +2,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { Nav } from "@/components/nav";
+import { RegisterSW } from "@/components/register-sw";
 
 export const metadata: Metadata = {
   title: "XAUUSD Elite Signals",
@@ -37,6 +38,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+        <RegisterSW />
         <Nav />
         {children}
 
