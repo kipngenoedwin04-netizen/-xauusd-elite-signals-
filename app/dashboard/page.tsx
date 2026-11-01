@@ -10,20 +10,13 @@ export default async function DashboardPage() {
     profile?.premium_status === "approved" ||
     profile?.role === "admin";
 
-  let signalsQuery = supabase
-    .from("signals")
-    .select(
-      "id,direction,access,entry,stop_loss,tp1,tp2,timeframe,analysis,status,created_at,image_url"
-    )
-    .order("created_at", { ascending: false })
-    .limit(50);
+  // Secure feed: the database decides which signal details
+  // this signed-in member is allowed to receive.
+  const { data: rawSignals, error } = await supabase.rpc(
+    "get_dashboard_signals"
+  );
 
-  // FREE members must never receive premium signals.
-  if (!approved) {
-    signalsQuery = signalsQuery.eq("access", "free");
-  }
-
-  const { data: signals, error } = await signalsQuery;
+  const signals = (rawSignals ?? []) as unknown as Signal[];
 
   return (
     <main className="dashboard-page">
@@ -54,18 +47,26 @@ export default async function DashboardPage() {
           <b>{approved ? "Premium access active" : "Free membership"}</b>
           <small>
             {approved
-              ? "You can view free and premium signals."
-              : "You can view free signals only."}
+              ? "You can view complete free and premium signals."
+              : "You can view free signals and VIP previews."}
           </small>
         </div>
 
         {!approved && (
           <div>
             <label>WANT PREMIUM ACCESS?</label>
-            <b>Request manual approval</b>
+            <b>Unlock full VIP signals</b>
             <small>
-              Contact PIXLEY021 through your community channel.
+              Contact PIXLEY021 for manual premium approval.
             </small>
+            <Link
+              href="https://t.me/pixley021"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-primary"
+            >
+              Unlock Premium
+            </Link>
           </div>
         )}
 
@@ -95,10 +96,10 @@ export default async function DashboardPage() {
         <div className="notice error">
           Could not load signals. Please refresh.
         </div>
-      ) : signals?.length ? (
+      ) : signals.length > 0 ? (
         <div className="signal-grid">
-          {signals.map((s) => (
-            <SignalCard key={s.id} signal={s as Signal} />
+          {signals.map((signal) => (
+            <SignalCard key={signal.id} signal={signal} />
           ))}
         </div>
       ) : (
@@ -111,4 +112,4 @@ export default async function DashboardPage() {
       )}
     </main>
   );
-              }
+}
