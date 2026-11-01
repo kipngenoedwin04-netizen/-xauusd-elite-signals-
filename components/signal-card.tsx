@@ -8,6 +8,7 @@ export type Signal = {
   status: string;
   created_at: string;
   direction?: string;
+  bias?: string;
   entry?: number | string | null;
   stop_loss?: number | string | null;
   tp1?: number | string | null;
@@ -30,37 +31,209 @@ export function SignalCard({ signal }: { signal: Signal }) {
   });
 
   if (isLockedPremium) {
+    const bias =
+      signal.bias === "BULLISH BIAS"
+        ? "BULLISH BIAS"
+        : signal.bias === "BEARISH BIAS"
+        ? "BEARISH BIAS"
+        : "MARKET UPDATE";
+
+    const bullish = bias === "BULLISH BIAS";
+    const biasColor = bullish ? "#35d49a" : "#ff7373";
+
     return (
-      <article className="signal-card vip-preview">
-        <div className="signal-top">
-          <span className="access-tag">VIP</span>
-          <span className="status">{signal.status}</span>
-        </div>
-
-        <div className="signal-title">
-          XAUUSD <small>GOLD</small>
-        </div>
-
-        <div className="analysis">
-          <label>PREMIUM SIGNAL · {signal.timeframe}</label>
-          <h3>Exclusive VIP signal published</h3>
-          <p>
-            This premium trade idea is available to approved members.
-            Unlock premium access to view the complete setup.
-          </p>
-        </div>
-
-        <Link
-          href="https://t.me/pixley021"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="btn btn-primary"
+      <article
+        style={{
+          position: "relative",
+          overflow: "hidden",
+          padding: "22px",
+          borderRadius: "20px",
+          border: "1px solid rgba(255, 193, 7, 0.65)",
+          background:
+            "radial-gradient(ellipse at top right, rgba(255,193,7,0.15), transparent 55%), linear-gradient(145deg, #171717, #080808 75%)",
+          boxShadow:
+            "0 0 22px rgba(255,193,7,0.12), inset 0 0 25px rgba(255,193,7,0.035)",
+          color: "#ffffff",
+          marginBottom: "18px",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: "10px",
+            flexWrap: "wrap",
+            marginBottom: "24px",
+          }}
         >
-          Unlock Premium
-        </Link>
+          <span
+            style={{
+              background: "linear-gradient(135deg, #ffe082, #d99b00)",
+              color: "#171000",
+              padding: "6px 13px",
+              borderRadius: "20px",
+              fontSize: "11px",
+              fontWeight: 900,
+              letterSpacing: "1px",
+            }}
+          >
+            👑 VIP SIGNAL
+          </span>
 
-        <footer className="signal-foot">
-          Published {published}
+          <span
+            style={{
+              color: "#f5c542",
+              fontSize: "11px",
+              fontWeight: 700,
+              textTransform: "uppercase",
+              letterSpacing: "1px",
+            }}
+          >
+            ● {signal.status}
+          </span>
+        </div>
+
+        <div style={{ marginBottom: "20px" }}>
+          <div
+            style={{
+              color: "#ffd54f",
+              fontSize: "25px",
+              fontWeight: 900,
+              letterSpacing: "1.5px",
+            }}
+          >
+            XAUUSD UPDATE
+          </div>
+          <div
+            style={{
+              color: "#888",
+              fontSize: "11px",
+              letterSpacing: "3px",
+              marginTop: "4px",
+            }}
+          >
+            GOLD · PREMIUM MARKET INSIGHT
+          </div>
+        </div>
+
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "10px",
+            marginBottom: "22px",
+          }}
+        >
+          <div
+            style={{
+              background: "#202020",
+              border: "1px solid #343434",
+              borderRadius: "12px",
+              padding: "13px",
+            }}
+          >
+            <div style={{ color: "#999", fontSize: "10px", marginBottom: "7px" }}>
+              TIMEFRAME
+            </div>
+            <div style={{ color: "#fff", fontSize: "15px", fontWeight: 800 }}>
+              {signal.timeframe}
+            </div>
+          </div>
+
+          <div
+            style={{
+              background: "#202020",
+              border: "1px solid #343434",
+              borderRadius: "12px",
+              padding: "13px",
+            }}
+          >
+            <div style={{ color: "#999", fontSize: "10px", marginBottom: "7px" }}>
+              MARKET BIAS
+            </div>
+            <div
+              style={{
+                color: biasColor,
+                fontSize: "14px",
+                fontWeight: 900,
+              }}
+            >
+              {bias}
+            </div>
+          </div>
+        </div>
+
+        <div
+          style={{
+            borderTop: "1px solid rgba(255,193,7,0.2)",
+            paddingTop: "22px",
+            textAlign: "center",
+          }}
+        >
+          <div style={{ fontSize: "36px", marginBottom: "8px" }}>
+            🔒
+          </div>
+
+          <div
+            style={{
+              color: "#ffd54f",
+              fontSize: "17px",
+              fontWeight: 900,
+              letterSpacing: "1.5px",
+              marginBottom: "9px",
+            }}
+          >
+            VIP SIGNAL LOCKED
+          </div>
+
+          <p
+            style={{
+              color: "#aaa",
+              fontSize: "13px",
+              lineHeight: 1.7,
+              margin: "0 auto 20px",
+              maxWidth: "310px",
+            }}
+          >
+            The complete trading setup is reserved for VIP members.
+            Unlock premium to access the entry, stop loss and take profit levels.
+          </p>
+
+          <Link
+            href="https://t.me/pixley021"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: "block",
+              width: "100%",
+              boxSizing: "border-box",
+              padding: "15px 12px",
+              borderRadius: "12px",
+              background: "linear-gradient(135deg, #ffe082, #d99b00)",
+              color: "#171000",
+              fontSize: "13px",
+              fontWeight: 900,
+              letterSpacing: "0.5px",
+              textDecoration: "none",
+              boxShadow: "0 5px 20px rgba(255,193,7,0.2)",
+            }}
+          >
+            👑 UNLOCK PREMIUM · @pixley021
+          </Link>
+        </div>
+
+        <footer
+          style={{
+            borderTop: "1px solid #292929",
+            marginTop: "20px",
+            paddingTop: "13px",
+            color: "#777",
+            fontSize: "11px",
+            textAlign: "center",
+          }}
+        >
+          XAUUSD ELITE SIGNALS · Published {published}
         </footer>
       </article>
     );
@@ -123,4 +296,4 @@ export function SignalCard({ signal }: { signal: Signal }) {
       </footer>
     </article>
   );
-}
+                }
