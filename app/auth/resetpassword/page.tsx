@@ -10,45 +10,35 @@ export default function ResetPasswordPage() {
 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [message, setMessage] = useState("Verifying recovery session...");
+  const [message, setMessage] = useState("Verifying recovery link...");
   const [loading, setLoading] = useState(false);
   const [verified, setVerified] = useState(false);
 
   useEffect(() => {
-    let active = true;
+    const supabase = createClient();
 
-    async function verifySession() {
-      const supabase = createClient();
-
-      const { data, error } = await supabase.auth.getUser();
-
-      if (!active) return;
-
-      if (error || !data.user) {
-        setMessage(
-          "Your recovery session is invalid or expired. Request a new password reset email."
-        );
-        setVerified(false);
-        return;
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "PASSWORD_RECOVERY" && session) {
+        setVerified(true);
+        setMessage("");
       }
-
-      setVerified(true);
-      setMessage("");
-    }
-
-    verifySession();
+    });
 
     return () => {
-      active = false;
+      subscription.unsubscribe();
     };
   }, []);
 
-  async function handleReset(event: React.FormEvent<HTMLFormElement>) {
+  async function handleReset(
+    event: React.FormEvent<HTMLFormElement>
+  ) {
     event.preventDefault();
     setMessage("");
 
     if (!verified) {
-      setMessage("Please use a valid password recovery link.");
+      setMessage("Please open a valid password recovery email link.");
       return;
     }
 
@@ -70,14 +60,11 @@ export default function ResetPasswordPage() {
       password,
     });
 
-    setLoading(false);
-
     if (error) {
+      setLoading(false);
       setMessage(error.message);
       return;
     }
-
-    setMessage("Password updated successfully. Redirecting to login...");
 
     await supabase.auth.signOut();
 
@@ -140,16 +127,14 @@ export default function ResetPasswordPage() {
               {loading ? "Updating..." : "Update Password"}
             </button>
           </form>
-        ) : null}
+        ) : (
+          <p style={{ marginTop: "20px" }}>
+            {message}
+          </p>
+        )}
 
-        {message && (
-          <p
-            role="status"
-            style={{
-              marginTop: "20px",
-              color: verified ? "#E9BB4E" : "#FFE99A",
-            }}
-          >
+        {verified && message && (
+          <p role="status" style={{ marginTop: "20px" }}>
             {message}
           </p>
         )}
