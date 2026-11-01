@@ -4,28 +4,8 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
-
-export async function requestPasswordReset(formData: FormData) {
-  const email = String(formData.get("email") ?? "").trim().toLowerCase();
-
-  if (!/^\S+@\S+\.\S+$/.test(email)) {
-    redirect("/auth/forgot-password?error=Enter+a+valid+email+address.");
-  }
-
-  const supabase = await createClient();
-
-  const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo:
-      "https://xauusd-elite-signals-ckyc.vercel.app/auth/reset-password",
-  });
-
-  if (error) {
-    redirect(`/auth/forgot-password?error=${encodeURIComponent(error.message)}`);
-  }
-
-  redirect("/auth/forgot-password?message=Check+your+email+for+the+password+reset+link.");
-}
-{
+// CREATE ACCOUNT
+export async function signUp(formData: FormData) {
   const displayName = String(formData.get("display_name") ?? "").trim();
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
   const password = String(formData.get("password") ?? "");
@@ -35,7 +15,9 @@ export async function requestPasswordReset(formData: FormData) {
     !/^\S+@\S+\.\S+$/.test(email) ||
     password.length < 8
   ) {
-    redirect("/auth/register?error=Check+your+details.+Password+must+be+at+least+8+characters.");
+    redirect(
+      "/auth/register?error=Check+your+details.+Password+must+be+at+least+8+characters."
+    );
   }
 
   const supabase = await createClient();
@@ -43,16 +25,21 @@ export async function requestPasswordReset(formData: FormData) {
   const { error } = await supabase.auth.signUp({
     email,
     password,
-    options: { data: { display_name: displayName } },
+    options: {
+      data: { display_name: displayName },
+    },
   });
 
   if (error) {
     redirect(`/auth/register?error=${encodeURIComponent(error.message)}`);
   }
 
-  redirect("/auth/login?message=Account+created.+Check+your+email+if+confirmation+is+enabled.");
+  redirect(
+    "/auth/login?message=Account+created.+Check+your+email+if+confirmation+is+enabled."
+  );
 }
 
+// MEMBER LOGIN
 export async function signIn(formData: FormData) {
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
   const password = String(formData.get("password") ?? "");
@@ -71,13 +58,16 @@ export async function signIn(formData: FormData) {
   redirect("/dashboard");
 }
 
+// LOGOUT
 export async function signOut() {
   const supabase = await createClient();
+
   await supabase.auth.signOut();
+
   redirect("/");
 }
 
-// Change password for an authenticated member
+// CHANGE PASSWORD
 export async function changePassword(formData: FormData) {
   const password = String(formData.get("password") ?? "");
   const confirmPassword = String(formData.get("confirm_password") ?? "");
@@ -91,11 +81,18 @@ export async function changePassword(formData: FormData) {
   }
 
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
 
-  if (!user) redirect("/auth/login");
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  const { error } = await supabase.auth.updateUser({ password });
+  if (!user) {
+    redirect("/auth/login");
+  }
+
+  const { error } = await supabase.auth.updateUser({
+    password,
+  });
 
   if (error) {
     redirect(`/settings?error=${encodeURIComponent(error.message)}`);
@@ -104,21 +101,30 @@ export async function changePassword(formData: FormData) {
   redirect("/settings?message=Password+updated+successfully.");
 }
 
-// Request a password reset email
+// REQUEST PASSWORD RESET EMAIL
 export async function requestPasswordReset(formData: FormData) {
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
 
   if (!/^\S+@\S+\.\S+$/.test(email)) {
-    redirect("/auth/forgot-password?error=Enter+a+valid+email+address.");
+    redirect(
+      "/auth/forgot-password?error=Enter+a+valid+email+address."
+    );
   }
 
   const supabase = await createClient();
 
-  const { error } = await supabase.auth.resetPasswordForEmail(email);
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo:
+      "https://xauusd-elite-signals-ckyc.vercel.app/auth/reset-password",
+  });
 
   if (error) {
-    redirect(`/auth/forgot-password?error=${encodeURIComponent(error.message)}`);
+    redirect(
+      `/auth/forgot-password?error=${encodeURIComponent(error.message)}`
+    );
   }
 
-  redirect("/auth/forgot-password?message=If+the+account+exists,+a+reset+email+has+been+sent.");
+  redirect(
+    "/auth/forgot-password?message=Check+your+email+for+the+password+reset+link."
+  );
 }
