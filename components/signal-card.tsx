@@ -3,11 +3,12 @@ import Link from "next/link";
 
 export type Signal = {
   id: string;
+  post_type?: "signal" | "analysis";
   access: string;
-  timeframe: string;
+  timeframe?: string | null;
   status: string;
   created_at: string;
-  direction?: string;
+  direction?: string | null;
   bias?: string;
   entry?: number | string | null;
   stop_loss?: number | string | null;
@@ -18,8 +19,12 @@ export type Signal = {
 };
 
 export function SignalCard({ signal }: { signal: Signal }) {
+  const isAnalysisPost = signal.post_type === "analysis";
+
   const isLockedPremium =
-    signal.access === "premium" && !signal.direction;
+    !isAnalysisPost &&
+    signal.access === "premium" &&
+    !signal.direction;
 
   const formatPrice = (value?: number | string | null) =>
     value == null ? "—" : Number(value).toFixed(2);
@@ -30,6 +35,181 @@ export function SignalCard({ signal }: { signal: Signal }) {
     timeZone: "Africa/Nairobi",
   });
 
+  // STANDALONE MARKET ANALYSIS CARD
+  if (isAnalysisPost) {
+    return (
+      <article
+        style={{
+          background:
+            "radial-gradient(ellipse at top right, rgba(255,193,7,0.13), transparent 55%), linear-gradient(145deg, #171717, #080808)",
+          border: "1px solid rgba(255,193,7,0.4)",
+          borderRadius: "20px",
+          padding: "22px",
+          color: "#fff",
+          marginBottom: "18px",
+          boxShadow: "0 8px 25px rgba(0,0,0,0.2)",
+          overflow: "hidden",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: "10px",
+            flexWrap: "wrap",
+            marginBottom: "20px",
+          }}
+        >
+          <span
+            style={{
+              background: "linear-gradient(135deg, #ffe082, #d99b00)",
+              color: "#171000",
+              padding: "7px 13px",
+              borderRadius: "20px",
+              fontSize: "11px",
+              fontWeight: 900,
+              letterSpacing: "1px",
+            }}
+          >
+            📊 MARKET ANALYSIS
+          </span>
+
+          <span
+            style={{
+              color: "#f5c542",
+              fontSize: "11px",
+              fontWeight: 800,
+            }}
+          >
+            XAUUSD · GOLD
+          </span>
+        </div>
+
+        <div style={{ marginBottom: "18px" }}>
+          <div
+            style={{
+              color: "#ffd54f",
+              fontSize: "25px",
+              fontWeight: 900,
+              letterSpacing: "1px",
+            }}
+          >
+            MARKET OUTLOOK
+          </div>
+
+          <div
+            style={{
+              color: "#888",
+              fontSize: "11px",
+              letterSpacing: "2px",
+              marginTop: "5px",
+            }}
+          >
+            XAUUSD ELITE SIGNALS
+          </div>
+        </div>
+
+        {signal.timeframe && (
+          <div
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
+              padding: "9px 13px",
+              background: "#222",
+              border: "1px solid #383838",
+              borderRadius: "10px",
+              marginBottom: "18px",
+            }}
+          >
+            <span style={{ color: "#999", fontSize: "11px" }}>
+              TIMEFRAME
+            </span>
+
+            <b style={{ color: "#fff", fontSize: "13px" }}>
+              {signal.timeframe}
+            </b>
+          </div>
+        )}
+
+        {signal.image_url && (
+          <div
+            style={{
+              marginBottom: "18px",
+              borderRadius: "13px",
+              overflow: "hidden",
+              border: "1px solid #383838",
+            }}
+          >
+            <img
+              src={signal.image_url}
+              alt="XAUUSD market analysis chart"
+              loading="lazy"
+              style={{
+                display: "block",
+                width: "100%",
+                height: "auto",
+              }}
+            />
+          </div>
+        )}
+
+        <div
+          style={{
+            background: "rgba(255,255,255,0.035)",
+            border: "1px solid #303030",
+            borderRadius: "13px",
+            padding: "17px",
+          }}
+        >
+          <div
+            style={{
+              color: "#ffd54f",
+              fontSize: "11px",
+              fontWeight: 900,
+              letterSpacing: "1.5px",
+              marginBottom: "12px",
+            }}
+          >
+            ANALYST'S MARKET VIEW
+          </div>
+
+          <p
+            style={{
+              color: "#ddd",
+              fontSize: "14px",
+              lineHeight: 1.85,
+              whiteSpace: "pre-wrap",
+              margin: 0,
+              overflowWrap: "anywhere",
+            }}
+          >
+            {signal.analysis}
+          </p>
+        </div>
+
+        <footer
+          style={{
+            borderTop: "1px solid #292929",
+            marginTop: "20px",
+            paddingTop: "14px",
+            color: "#888",
+            fontSize: "11px",
+            display: "flex",
+            justifyContent: "space-between",
+            flexWrap: "wrap",
+            gap: "8px",
+          }}
+        >
+          <span>XAUUSD ELITE SIGNALS</span>
+          <span>Published {published}</span>
+        </footer>
+      </article>
+    );
+  }
+
+  // LOCKED VIP SIGNAL PREVIEW
   if (isLockedPremium) {
     const bias =
       signal.bias === "BULLISH BIAS"
@@ -105,6 +285,7 @@ export function SignalCard({ signal }: { signal: Signal }) {
           >
             XAUUSD UPDATE
           </div>
+
           <div
             style={{
               color: "#888",
@@ -133,11 +314,24 @@ export function SignalCard({ signal }: { signal: Signal }) {
               padding: "13px",
             }}
           >
-            <div style={{ color: "#999", fontSize: "10px", marginBottom: "7px" }}>
+            <div
+              style={{
+                color: "#999",
+                fontSize: "10px",
+                marginBottom: "7px",
+              }}
+            >
               TIMEFRAME
             </div>
-            <div style={{ color: "#fff", fontSize: "15px", fontWeight: 800 }}>
-              {signal.timeframe}
+
+            <div
+              style={{
+                color: "#fff",
+                fontSize: "15px",
+                fontWeight: 800,
+              }}
+            >
+              {signal.timeframe || "—"}
             </div>
           </div>
 
@@ -149,9 +343,16 @@ export function SignalCard({ signal }: { signal: Signal }) {
               padding: "13px",
             }}
           >
-            <div style={{ color: "#999", fontSize: "10px", marginBottom: "7px" }}>
+            <div
+              style={{
+                color: "#999",
+                fontSize: "10px",
+                marginBottom: "7px",
+              }}
+            >
               MARKET BIAS
             </div>
+
             <div
               style={{
                 color: biasColor,
@@ -239,6 +440,7 @@ export function SignalCard({ signal }: { signal: Signal }) {
     );
   }
 
+  // NORMAL TRADING SIGNAL
   return (
     <article className="signal-card">
       <div className="signal-top">
@@ -249,7 +451,11 @@ export function SignalCard({ signal }: { signal: Signal }) {
         >
           {signal.direction}
         </span>
-        <span className="access-tag">{signal.access.toUpperCase()}</span>
+
+        <span className="access-tag">
+          {signal.access.toUpperCase()}
+        </span>
+
         <span className="status">{signal.status}</span>
       </div>
 
@@ -272,28 +478,37 @@ export function SignalCard({ signal }: { signal: Signal }) {
           <label>ENTRY</label>
           <b>{formatPrice(signal.entry)}</b>
         </div>
+
         <div>
           <label>STOP LOSS</label>
           <b className="danger">{formatPrice(signal.stop_loss)}</b>
         </div>
+
         <div>
           <label>TAKE PROFIT 1</label>
           <b className="success">{formatPrice(signal.tp1)}</b>
         </div>
+
         <div>
           <label>TAKE PROFIT 2</label>
           <b className="success">{formatPrice(signal.tp2)}</b>
         </div>
       </div>
 
-      <div className="analysis">
-        <label>MARKET ANALYSIS · {signal.timeframe}</label>
-        <p>{signal.analysis}</p>
-      </div>
+      {signal.analysis && (
+        <div className="analysis">
+          <label>
+            MARKET ANALYSIS
+            {signal.timeframe ? ` · ${signal.timeframe}` : ""}
+          </label>
+
+          <p>{signal.analysis}</p>
+        </div>
+      )}
 
       <footer className="signal-foot">
         Published {published}
       </footer>
     </article>
   );
-                }
+              }
