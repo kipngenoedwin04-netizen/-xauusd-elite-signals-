@@ -4,7 +4,28 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
-export async function signUp(formData: FormData) {
+
+export async function requestPasswordReset(formData: FormData) {
+  const email = String(formData.get("email") ?? "").trim().toLowerCase();
+
+  if (!/^\S+@\S+\.\S+$/.test(email)) {
+    redirect("/auth/forgot-password?error=Enter+a+valid+email+address.");
+  }
+
+  const supabase = await createClient();
+
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo:
+      "https://xauusd-elite-signals-ckyc.vercel.app/auth/reset-password",
+  });
+
+  if (error) {
+    redirect(`/auth/forgot-password?error=${encodeURIComponent(error.message)}`);
+  }
+
+  redirect("/auth/forgot-password?message=Check+your+email+for+the+password+reset+link.");
+}
+{
   const displayName = String(formData.get("display_name") ?? "").trim();
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
   const password = String(formData.get("password") ?? "");
